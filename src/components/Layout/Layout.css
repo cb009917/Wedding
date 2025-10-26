@@ -1,0 +1,22 @@
+/* Layout Container */
+.layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-bg-white);
+}
+
+/* Main Content Area */
+.layout-main {
+  flex: 1;
+  width: 100%;
+  position: relative;
+  padding-top: 80px;
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .layout-main {
+    padding-top: 90px;
+  }
+}

@@ -1,0 +1,93 @@
+/* Footer Container */
+.footer {
+  background-color: var(--color-bg-light-blush);
+  border-top: 1px solid var(--color-soft-gray);
+  padding: var(--spacing-3xl) 0 var(--spacing-xl);
+  text-align: center;
+}
+
+/* Footer Content */
+.footer-content {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-lg);
+}
+
+@media (min-width: 768px) {
+  .footer-content {
+    padding: 0 var(--spacing-xl);
+  }
+}
+
+/* Couple Names/Initials */
+.footer-names h3 {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-rose-gold);
+  letter-spacing: var(--letter-spacing-wide);
+  margin: 0;
+}
+
+/* Wedding Date */
+.footer-date p {
+  font-family: var(--font-accent);
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Decorative Divider */
+.footer-divider {
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(
+    to right,
+    transparent,
+    var(--color-accent),
+    transparent
+  );
+  margin: var(--spacing-md) 0;
+}
+
+/* Credits and Copyright */
+.footer-credits {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.footer-credits p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.footer-copyright {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+/* Responsive adjustments */
+@media (min-width: 768px) {
+  .footer {
+    padding: var(--spacing-4xl) 0 var(--spacing-xl);
+  }
+
+  .footer-content {
+    gap: var(--spacing-xl);
+  }
+
+  .footer-names h3 {
+    font-size: var(--font-size-2xl);
+  }
+
+  .footer-date p {
+    font-size: var(--font-size-lg);
+  }
+}

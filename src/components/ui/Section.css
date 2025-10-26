@@ -1,0 +1,90 @@
+/* Base Section Styles */
+.section {
+  display: block;
+  width: 100%;
+  position: relative;
+  transition: background-color var(--duration-base) var(--ease-in-out);
+}
+
+/* Background Variants */
+.section-bg-white {
+  background-color: var(--color-bg-white);
+}
+
+.section-bg-light {
+  background-color: var(--color-bg-off-white);
+}
+
+.section-bg-accent {
+  background-color: var(--color-bg-light-blush);
+}
+
+.section-bg-transparent {
+  background-color: transparent;
+}
+
+/* Padding Variants - Mobile First */
+.section-padding-none {
+  padding: 0;
+}
+
+.section-padding-small {
+  padding-top: var(--spacing-xl);
+  padding-bottom: var(--spacing-xl);
+}
+
+.section-padding-medium {
+  padding-top: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+}
+
+.section-padding-large {
+  padding-top: var(--spacing-3xl);
+  padding-bottom: var(--spacing-3xl);
+}
+
+/* Desktop Padding */
+@media (min-width: 768px) {
+  .section-padding-small {
+    padding-top: var(--spacing-2xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+
+  .section-padding-medium {
+    padding-top: var(--spacing-4xl);
+    padding-bottom: var(--spacing-4xl);
+  }
+
+  .section-padding-large {
+    padding-top: var(--spacing-5xl);
+    padding-bottom: var(--spacing-5xl);
+  }
+}
+
+/* Container */
+.section-container {
+  max-width: var(--container-xl);
+  margin: 0 auto;
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+@media (min-width: 768px) {
+  .section-container {
+    padding-left: var(--spacing-xl);
+    padding-right: var(--spacing-xl);
+  }
+}
+
+/* Animation */
+.animate-on-scroll {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity var(--duration-medium) var(--ease-elegant),
+    transform var(--duration-medium) var(--ease-elegant);
+}
+
+.animate-on-scroll.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
