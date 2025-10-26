@@ -160,7 +160,7 @@ export const galleryPhotos = [
 // John       | Smith     | John Smith | 5     | 2
 // Jane       | Doe       | Jane Doe   | 3     | 1
 export const googleSheetsConfig = {
-  spreadsheetId: 'YOUR_SPREADSHEET_ID_HERE', // Or use import.meta.env.VITE_GOOGLE_SHEETS_SPREADSHEET_ID
+  spreadsheetId: 'https://docs.google.com/spreadsheets/d/1Do7hgEA6x9jwmT9wspZLbUro-XL1b-KyrM-NSy5-zxw/edit?usp=sharing', // Or use import.meta.env.VITE_GOOGLE_SHEETS_SPREADSHEET_ID
   sheetRange: 'Guests!A1:E', // Sheet name and cell range
 };
 

@@ -48,10 +48,10 @@ export function fuzzySearchGuests(query, guests, options = {}) {
   const matches = [];
 
   guests.forEach(guest => {
-    const matchResult = matchGuest(normalizedQuery, guest, searchFields);
+    const matchResult = matchGuest(normalizedQuery, guest, searchFields, maxDistance);
 
     if (matchResult) {
-      const { score, matchedField } = matchResult;
+      const { score, matchedField, distance } = matchResult;
 
       // Filter by similarity threshold
       if (score >= effectiveMinSimilarity) {
@@ -59,6 +59,7 @@ export function fuzzySearchGuests(query, guests, options = {}) {
           guest,
           score,
           matchedField,
+          distance,
         });
       }
     }
@@ -162,7 +163,9 @@ export function levenshteinDistance(str1, str2) {
       const val = row[j];
 
       if (str1[i - 1] === str2[j - 1]) {
-        row[j] = row[j - 1]; // No change needed
+        // Use the diagonal value when characters are equal (prev holds diagonal)
+        // This fixes incorrect distances where the left cell was used instead of diagonal.
+        row[j] = prev; // No change needed (diagonal)
       } else {
         row[j] = Math.min(
           row[j - 1] + 1,  // Insertion
@@ -219,9 +222,14 @@ export function calculateSimilarity(str1, str2) {
  * matchGuest('john', { firstName: 'John', lastName: 'Doe', fullName: 'John Doe' }, ['fullName', 'firstName'])
  * // Returns: { score: 1.0, matchedField: 'firstName' }
  */
-function matchGuest(normalizedQuery, guest, searchFields) {
+function matchGuest(normalizedQuery, guest, searchFields, maxDistance = Infinity) {
   let bestScore = 0;
   let bestField = null;
+
+  // Ensure maxDistance is numeric if provided
+  if (maxDistance == null) {
+    maxDistance = Infinity;
+  }
 
   // Try each search field
   searchFields.forEach(field => {
@@ -232,6 +240,12 @@ function matchGuest(normalizedQuery, guest, searchFields) {
     }
 
     const normalizedField = normalizeString(fieldValue);
+
+    // Calculate Levenshtein distance and enforce maxDistance if provided
+    const distance = levenshteinDistance(normalizedQuery, normalizedField);
+    if (typeof maxDistance === 'number' && distance > maxDistance) {
+      return; // skip this field if too far
+    }
 
     // Calculate base similarity score
     let score = calculateSimilarity(normalizedQuery, normalizedField);
@@ -256,48 +270,67 @@ function matchGuest(normalizedQuery, guest, searchFields) {
   // Also try matching against combined first+last name (if both exist)
   if (guest.firstName && guest.lastName) {
     const combinedName = normalizeString(`${guest.firstName} ${guest.lastName}`);
-    let score = calculateSimilarity(normalizedQuery, combinedName);
+    const combinedDistance = levenshteinDistance(normalizedQuery, combinedName);
+    if (typeof maxDistance === 'number' && combinedDistance <= maxDistance) {
+      let score = calculateSimilarity(normalizedQuery, combinedName);
 
-    // Substring bonus
-    if (combinedName.includes(normalizedQuery)) {
-      score = Math.max(score, 0.85);
-    }
+      // Substring bonus
+      if (combinedName.includes(normalizedQuery)) {
+        score = Math.max(score, 0.85);
+      }
 
-    // Prefix bonus
-    if (combinedName.startsWith(normalizedQuery)) {
-      score = Math.max(score, 0.9);
-    }
+      // Prefix bonus
+      if (combinedName.startsWith(normalizedQuery)) {
+        score = Math.max(score, 0.9);
+      }
 
-    if (score > bestScore) {
-      bestScore = score;
-      bestField = 'fullName';
+      if (score > bestScore) {
+        bestScore = score;
+        bestField = 'fullName';
+      }
     }
   }
 
   // Also try matching against reversed name (Last, First format)
   if (guest.firstName && guest.lastName) {
     const reversedName = normalizeString(`${guest.lastName} ${guest.firstName}`);
-    let score = calculateSimilarity(normalizedQuery, reversedName);
+    const reversedDistance = levenshteinDistance(normalizedQuery, reversedName);
+    if (typeof maxDistance === 'number' && reversedDistance <= maxDistance) {
+      let score = calculateSimilarity(normalizedQuery, reversedName);
 
-    // Substring bonus
-    if (reversedName.includes(normalizedQuery)) {
-      score = Math.max(score, 0.85);
-    }
+      // Substring bonus
+      if (reversedName.includes(normalizedQuery)) {
+        score = Math.max(score, 0.85);
+      }
 
-    // Prefix bonus
-    if (reversedName.startsWith(normalizedQuery)) {
-      score = Math.max(score, 0.9);
-    }
+      // Prefix bonus
+      if (reversedName.startsWith(normalizedQuery)) {
+        score = Math.max(score, 0.9);
+      }
 
-    if (score > bestScore) {
-      bestScore = score;
-      bestField = 'fullName';
+      if (score > bestScore) {
+        bestScore = score;
+        bestField = 'fullName';
+      }
     }
   }
 
   // Return best match or null if no good match found
   if (bestScore > 0) {
-    return { score: bestScore, matchedField: bestField };
+    // Also include the distance for the best field as supplemental info
+    // Compute distance against the bestField for the return value
+    let distance = null;
+    try {
+      if (bestField && guest[bestField]) {
+        distance = levenshteinDistance(normalizedQuery, normalizeString(guest[bestField]));
+      } else if (guest.firstName && guest.lastName) {
+        distance = levenshteinDistance(normalizedQuery, normalizeString(`${guest.firstName} ${guest.lastName}`));
+      }
+    } catch (e) {
+      distance = null;
+    }
+
+    return { score: bestScore, matchedField: bestField, distance };
   }
 
   return null;

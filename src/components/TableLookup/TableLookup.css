@@ -274,6 +274,12 @@
   transform: translateY(0);
 }
 
+/* Focus state for keyboard accessibility on clickable result items */
+.result-item:focus {
+  outline: 3px solid rgba(212, 175, 55, 0.2);
+  outline-offset: 2px;
+}
+
 .result-item-name {
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-md);

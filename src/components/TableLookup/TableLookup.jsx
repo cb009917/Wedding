@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Section from '../ui/Section.jsx';
 import Card from '../ui/Card.jsx';
 import Button from '../ui/Button.jsx';
@@ -36,61 +36,71 @@ function TableLookup({
   const [loadingState, setLoadingState] = useState('idle'); // 'idle' | 'loading' | 'success' | 'error'
   const [errorMessage, setErrorMessage] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
+  const [selectedResult, setSelectedResult] = useState(null);
 
   // Refs
   const inputRef = useRef(null);
 
-  // Effect 1 - Fetch guest data on mount
-  useEffect(() => {
-    async function loadGuestData() {
-      // Get configuration from props or environment variables
-      const apiKey = import.meta.env.VITE_GOOGLE_SHEETS_API_KEY;
-      const sheetId = spreadsheetId || import.meta.env.VITE_GOOGLE_SHEETS_SPREADSHEET_ID;
+  // loadGuestData - wrapped in useCallback so it can be retried
+  const loadGuestData = useCallback(async () => {
+    // Get configuration from props or environment variables
+    const apiKey = import.meta.env.VITE_GOOGLE_SHEETS_API_KEY;
+    const sheetId = spreadsheetId || import.meta.env.VITE_GOOGLE_SHEETS_SPREADSHEET_ID;
 
-      // Validate configuration
-      if (!apiKey) {
-        setErrorMessage('Table lookup is not configured. Please contact the wedding organizers.');
-        setLoadingState('error');
-        return;
-      }
-
-      if (!sheetId) {
-        setErrorMessage('Guest list configuration is missing. Please contact the wedding organizers.');
-        setLoadingState('error');
-        return;
-      }
-
-      // Set loading state
-      setLoadingState('loading');
-
-      try {
-        // Fetch guest data from Google Sheets
-        const guestData = await fetchTableAssignments(sheetId, sheetRange, apiKey);
-
-        // Store guests and mark as success
-        setGuests(guestData);
-        setLoadingState('success');
-      } catch (error) {
-        // Handle different error types
-        let userFriendlyMessage = 'Unable to load guest list. Please try again later.';
-
-        if (error.message.includes('API key')) {
-          userFriendlyMessage = 'Table lookup is not configured. Please contact the wedding organizers.';
-        } else if (error.message.includes('Network error')) {
-          userFriendlyMessage = 'Unable to load guest list. Please check your connection and try again.';
-        } else if (error.message.includes('Invalid spreadsheet')) {
-          userFriendlyMessage = 'Guest list not found. Please contact the wedding organizers.';
-        } else if (error.message.includes('No data')) {
-          userFriendlyMessage = 'Guest list is currently empty. Please contact the wedding organizers.';
-        }
-
-        setErrorMessage(userFriendlyMessage);
-        setLoadingState('error');
-      }
+    // Validate configuration
+    if (!apiKey) {
+      setErrorMessage('Table lookup is not configured. Please contact the wedding organizers.');
+      setLoadingState('error');
+      return;
     }
 
+    if (!sheetId) {
+      setErrorMessage('Guest list configuration is missing. Please contact the wedding organizers.');
+      setLoadingState('error');
+      return;
+    }
+
+    // Set loading state
+    setLoadingState('loading');
+    setErrorMessage(null);
+
+    try {
+      // Fetch guest data from Google Sheets
+      const guestData = await fetchTableAssignments(sheetId, sheetRange, apiKey);
+
+      // Store guests and mark as success
+      setGuests(guestData);
+      setLoadingState('success');
+    } catch (error) {
+      // Handle different error types
+      let userFriendlyMessage = 'Unable to load guest list. Please try again later.';
+
+      if (error.message.includes('API key')) {
+        userFriendlyMessage = 'Table lookup is not configured. Please contact the wedding organizers.';
+      } else if (error.message.includes('Network error')) {
+        userFriendlyMessage = 'Unable to load guest list. Please check your connection and try again.';
+      } else if (error.message.includes('Invalid spreadsheet')) {
+        userFriendlyMessage = 'Guest list not found. Please contact the wedding organizers.';
+      } else if (error.message.includes('No data')) {
+        userFriendlyMessage = 'Guest list is currently empty. Please contact the wedding organizers.';
+      }
+
+      setErrorMessage(userFriendlyMessage);
+      setLoadingState('error');
+    }
+  }, [spreadsheetId, sheetRange]);
+
+  // Call loadGuestData on mount
+  useEffect(() => {
     loadGuestData();
-  }, []); // Run once on mount
+  }, [loadGuestData]);
+
+  // Focus input when data becomes available
+  useEffect(() => {
+    if (loadingState === 'success') {
+      inputRef.current?.focus();
+    }
+  }, [loadingState]);
 
   // Handle search form submission
   const handleSearch = (e) => {
@@ -105,6 +115,9 @@ function TableLookup({
     if (!guests || loadingState !== 'success') {
       return;
     }
+
+    // Reset any previously selected result
+    setSelectedResult(null);
 
     // Perform fuzzy search
     const results = fuzzySearchGuests(searchQuery, guests, {
@@ -130,10 +143,16 @@ function TableLookup({
     setSearchQuery('');
     setSearchResults(null);
     setHasSearched(false);
+    setSelectedResult(null);
     // Focus input
     if (inputRef.current) {
       inputRef.current.focus();
     }
+  };
+
+  // Select a single result from multiple matches
+  const handleSelect = (result) => {
+    setSelectedResult(result);
   };
 
   return (
@@ -160,7 +179,7 @@ function TableLookup({
                 value={searchQuery}
                 onChange={handleInputChange}
                 placeholder={searchPlaceholder}
-                disabled={loadingState === 'loading' || loadingState === 'error'}
+                disabled={loadingState === 'loading'}
                 aria-label="Search for your name"
                 autoComplete="off"
               />
@@ -191,6 +210,11 @@ function TableLookup({
             <div className="error-content">
               <span className="error-icon" aria-hidden="true">⚠️</span>
               <p className="error-message">{errorMessage}</p>
+              <div style={{ marginTop: 'var(--spacing-md)' }}>
+                <Button variant="primary" onClick={() => { setLoadingState('loading'); loadGuestData(); }}>
+                  Retry
+                </Button>
+              </div>
             </div>
           </Card>
         </div>
@@ -242,6 +266,26 @@ function TableLookup({
             </div>
           )}
 
+          {/* Selected Result (from multiple list) */}
+          {selectedResult && (
+            <div className="result-success animate-fade-in-up">
+              <Card variant="elevated" padding="large">
+                <p className="result-guest-name">{selectedResult.guest.fullName}</p>
+                <div className="result-table">
+                  <span className="table-label">You're seated at</span>
+                  <span className="table-number">Table {selectedResult.guest.table}</span>
+                </div>
+                {selectedResult.guest.guests && (
+                  <p className="result-guests">Party of {selectedResult.guest.guests}</p>
+                )}
+                <p className="result-message">We look forward to celebrating with you!</p>
+                <Button variant="secondary" onClick={() => setSelectedResult(null)}>
+                  Back
+                </Button>
+              </Card>
+            </div>
+          )}
+
           {/* Multiple Results */}
           {searchResults && searchResults.length > 1 && (
             <div className="multiple-results">
@@ -255,6 +299,7 @@ function TableLookup({
                     className="result-item animate-fade-in-up"
                     style={{ animationDelay: `${index * 0.1}s` }}
                     padding="medium"
+                    onClick={() => handleSelect(result)}
                   >
                     <p className="result-item-name">{result.guest.fullName}</p>
                     <p className="result-item-table">Table {result.guest.table}</p>

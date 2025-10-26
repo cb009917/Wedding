@@ -1,12 +1,9 @@
+import { lazy, Suspense } from 'react';
 import Layout from './components/Layout/Layout';
 import { Section } from './components/ui';
-import HeroSection from './components/HeroSection';
-import WeddingDetails from './components/WeddingDetails';
-import StorySection from './components/StorySection';
-import CountdownTimer from './components/CountdownTimer';
-import DirectionsSection from './components/DirectionsSection';
-import PhotoGallery from './components/Gallery/PhotoGallery';
-import TableLookup from './components/TableLookup/TableLookup';
+import LoadingFallback from './components/LoadingFallback';
+import ErrorBoundary from './components/ErrorBoundary';
+import HeroSection from './components/HeroSection'; // Direct import for better LCP
 import {
   coupleInfo,
   weddingDate,
@@ -20,10 +17,18 @@ import {
   googleSheetsConfig,
 } from './data/weddingData';
 
+// Lazy load components for code splitting (Hero is imported directly above)
+const WeddingDetails = lazy(() => import('./components/WeddingDetails'));
+const StorySection = lazy(() => import('./components/StorySection'));
+const CountdownTimer = lazy(() => import('./components/CountdownTimer'));
+const DirectionsSection = lazy(() => import('./components/DirectionsSection'));
+const PhotoGallery = lazy(() => import('./components/Gallery/PhotoGallery'));
+const TableLookup = lazy(() => import('./components/TableLookup/TableLookup'));
+
 function App() {
   return (
     <Layout>
-      {/* Hero Section */}
+      {/* Hero Section - Direct render for better LCP */}
       <HeroSection
         coupleNames={{ bride: coupleInfo.bride, groom: coupleInfo.groom }}
         weddingDate={weddingDate.displayDate}
@@ -31,40 +36,58 @@ function App() {
       />
 
       {/* Countdown Timer Section */}
-      <Section id="countdown" background="accent" padding="medium">
-        <CountdownTimer targetDate={weddingDate.date} />
-      </Section>
+      <Suspense fallback={<LoadingFallback />}>
+        <Section id="countdown" background="accent" padding="medium">
+          <CountdownTimer targetDate={weddingDate.date} />
+        </Section>
+      </Suspense>
 
       {/* Story Section */}
-      <StorySection
-        story={{
-          introduction: storyIntroduction,
-          timeline: storyTimeline,
-        }}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <StorySection
+          story={{
+            introduction: storyIntroduction,
+            timeline: storyTimeline,
+          }}
+        />
+      </Suspense>
 
       {/* Wedding Details Section */}
-      <WeddingDetails
-        ceremony={ceremonyDetails}
-        reception={receptionDetails}
-        dressCode={dressCode}
-      />
+      <Suspense fallback={<LoadingFallback />}>
+        <WeddingDetails
+          ceremony={ceremonyDetails}
+          reception={receptionDetails}
+          dressCode={dressCode}
+        />
+      </Suspense>
 
       {/* Directions Section */}
-      <DirectionsSection
-        venue={venueLocation}
-        coordinates={venueLocation.coordinates}
-        additionalInfo={venueLocation.additionalInfo}
-      />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <DirectionsSection
+            venue={venueLocation}
+            coordinates={venueLocation.coordinates}
+            additionalInfo={venueLocation.additionalInfo}
+          />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Photos Section */}
-      <PhotoGallery photos={galleryPhotos} />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <PhotoGallery photos={galleryPhotos} />
+        </Suspense>
+      </ErrorBoundary>
 
       {/* Table Lookup Section */}
-      <TableLookup
-        spreadsheetId={googleSheetsConfig.spreadsheetId}
-        sheetRange={googleSheetsConfig.sheetRange}
-      />
+      <ErrorBoundary>
+        <Suspense fallback={<LoadingFallback />}>
+          <TableLookup
+            spreadsheetId={googleSheetsConfig.spreadsheetId}
+            sheetRange={googleSheetsConfig.sheetRange}
+          />
+        </Suspense>
+      </ErrorBoundary>
     </Layout>
   );
 }

@@ -246,9 +246,14 @@ export function normalizeGuestData(guest) {
 
   // Normalize table number (remove 'Table' prefix if present, keep just the number or full text)
   if (normalized.table) {
-    const tableMatch = normalized.table.match(/\d+/);
-    // Keep original format but ensure it's trimmed
-    normalized.table = normalized.table.trim();
+    // Prefer numeric table number (e.g. '5') to avoid UI rendering "Table Table 5"
+    const digits = ('' + normalized.table).match(/\d+/);
+    if (digits) {
+      normalized.table = digits[0];
+    } else {
+      // Fallback to trimmed original value (no digits found)
+      normalized.table = normalized.table.trim();
+    }
   }
 
   // Ensure guests field exists (default to empty string)
