@@ -1,5 +1,5 @@
-import Layout from './components/Layout/Layout';
-import { Section, Button, Card } from './components/ui';
+import Layout from './src/components/Layout/Layout';
+import { Section, Button, Card } from './src/components/ui';
 
 function App() {
   return (
