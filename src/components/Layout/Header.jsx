@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { acquireLock, releaseLock } from '../../utils/scrollLock';
 import './Header.css';
 
 function Header() {
@@ -19,9 +20,9 @@ function Header() {
 
   useEffect(() => {
     if (isMenuOpen) {
-      document.body.classList.add('no-scroll');
+      acquireLock('header-menu');
     } else {
-      document.body.classList.remove('no-scroll');
+      releaseLock('header-menu');
       if (menuButtonRef.current) {
         menuButtonRef.current.focus();
       }
@@ -62,7 +63,6 @@ function Header() {
     return () => {
       window.removeEventListener('keydown', handleEscape);
       window.removeEventListener('keydown', handleFocusTrap);
-      document.body.classList.remove('no-scroll');
     };
   }, [isMenuOpen]);
 
@@ -70,7 +70,6 @@ function Header() {
     const handleResize = () => {
       if (window.innerWidth >= 768) {
         setIsMenuOpen(false);
-        document.body.classList.remove('no-scroll');
       }
     };
 

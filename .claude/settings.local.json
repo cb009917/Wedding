@@ -6,7 +6,11 @@
       "Bash(git add:*)",
       "Bash(git commit -m \"$(cat <<''EOF''\nAdd .gitkeep files to preserve empty directory structure\n\n- Added .gitkeep to src/components, src/assets, src/styles, and src/utils\n- Updated vite.config.js with base path for GitHub Pages deployment\n- Added gh-pages dependency and deploy scripts to package.json\n- Replaced Vite template UI with wedding placeholder in App.jsx\n- Enhanced .gitignore with environment files, Vite cache, and Windows artifacts\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
       "Bash(git ls-tree:*)",
-      "Bash(test:*)"
+      "Bash(test:*)",
+      "Bash(if [ -f \"c:/Users/TUF/Desktop/Wedding/src/assets/photos/.gitkeep\" ])",
+      "Bash(then rm \"c:/Users/TUF/Desktop/Wedding/src/assets/photos/.gitkeep\")",
+      "Bash(else echo \"File does not exist\")",
+      "Bash(fi)"
     ],
     "deny": [],
     "ask": []

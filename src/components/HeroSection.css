@@ -1,0 +1,122 @@
+/* Hero Container */
+.hero-container {
+  min-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  text-align: center;
+  padding-top: var(--spacing-4xl);
+  padding-bottom: var(--spacing-4xl);
+}
+
+.hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+/* Couple Names */
+.hero-names {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-3xl);
+  letter-spacing: var(--letter-spacing-wide);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+/* Ampersand */
+.hero-ampersand {
+  font-family: var(--font-accent);
+  color: var(--color-rose-gold);
+  font-size: 1.2em;
+  font-style: italic;
+  display: inline-block;
+  margin: 0 var(--spacing-sm);
+}
+
+/* Wedding Date */
+.hero-date {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-secondary);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-md);
+  font-family: var(--font-accent);
+}
+
+/* Tagline */
+.hero-tagline {
+  font-size: var(--font-size-md);
+  color: var(--color-text-muted);
+  max-width: 600px;
+  margin: 0 auto var(--spacing-2xl);
+  line-height: var(--line-height-relaxed);
+}
+
+/* CTA Button */
+.hero-cta {
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* Scroll Indicator */
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  transition: color var(--duration-base) var(--ease-in-out);
+}
+
+.hero-scroll-indicator:hover {
+  color: var(--color-accent);
+}
+
+.scroll-text {
+  letter-spacing: var(--letter-spacing-wide);
+  text-transform: uppercase;
+  font-size: var(--font-size-xs);
+}
+
+.scroll-arrow {
+  font-size: var(--font-size-lg);
+  animation: float 3s var(--ease-in-out) infinite;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+  .hero-container {
+    min-height: 70vh;
+    padding-top: var(--spacing-2xl);
+    padding-bottom: var(--spacing-2xl);
+  }
+
+  .hero-names {
+    font-size: var(--font-size-2xl);
+  }
+
+  .hero-date {
+    font-size: var(--font-size-lg);
+  }
+
+  .hero-tagline {
+    font-size: var(--font-size-base);
+  }
+
+  .hero-scroll-indicator {
+    bottom: var(--spacing-md);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .hero-container {
+    min-height: 80vh;
+  }
+}

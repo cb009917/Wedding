@@ -1,0 +1,188 @@
+/* Section Header */
+.story-header {
+  text-align: center;
+  margin-bottom: var(--spacing-2xl);
+}
+
+/* Introduction */
+.story-intro {
+  max-width: 800px;
+  margin: 0 auto var(--spacing-3xl);
+  text-align: center;
+  font-size: var(--font-size-md);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* Timeline Container */
+.story-timeline {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding-top: var(--spacing-2xl);
+  padding-bottom: var(--spacing-2xl);
+}
+
+/* Timeline Line */
+.timeline-line {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    var(--color-soft-gray) 10%,
+    var(--color-soft-gray) 90%,
+    transparent
+  );
+  top: 0;
+  z-index: var(--z-base);
+}
+
+/* Timeline Items List */
+.timeline-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Timeline Item */
+.timeline-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--spacing-4xl);
+}
+
+.timeline-item:nth-child(odd) {
+  justify-content: flex-end;
+  padding-right: calc(50% + 60px);
+}
+
+.timeline-item:nth-child(even) {
+  justify-content: flex-start;
+  padding-left: calc(50% + 60px);
+}
+
+/* Date Badge */
+.timeline-date {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-white);
+  border: 3px solid var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  text-align: center;
+  z-index: var(--z-dropdown);
+  padding: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Timeline Content Card */
+.timeline-content {
+  max-width: 450px;
+  width: 100%;
+}
+
+/* Event Title */
+.timeline-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Event Description */
+.timeline-description {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* Narrative Layout */
+.story-narrative {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.narrative-item {
+  margin-bottom: var(--spacing-xl);
+}
+
+.narrative-date {
+  display: block;
+  font-size: var(--font-size-sm);
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
+}
+
+.narrative-title {
+  font-family: var(--font-heading);
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-md);
+}
+
+.narrative-description {
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 767px) {
+  .timeline-line {
+    left: 30px;
+    transform: none;
+  }
+
+  .timeline-item {
+    justify-content: flex-start !important;
+    padding-left: 80px !important;
+    padding-right: 0 !important;
+  }
+
+  .timeline-date {
+    left: 30px;
+    transform: none;
+    width: 70px;
+    height: 70px;
+    font-size: var(--font-size-xs);
+  }
+
+  .timeline-content {
+    max-width: 100%;
+  }
+
+  .timeline-title {
+    font-size: var(--font-size-md);
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .timeline-item:nth-child(odd) {
+    padding-right: calc(50% + 50px);
+  }
+
+  .timeline-item:nth-child(even) {
+    padding-left: calc(50% + 50px);
+  }
+
+  .timeline-date {
+    width: 90px;
+    height: 90px;
+  }
+}
